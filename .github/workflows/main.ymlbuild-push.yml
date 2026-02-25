@@ -1,0 +1,34 @@
+name: Build & Push
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Login en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: calonsocaminafpfomento
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build y Push de la imagen
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: calonsocaminafpfomento/daw-web:latest
+
+      - name: Ejecutar contenedor en puerto 8888
+        run: |
+          docker stop daw-web-container || true
+          docker rm daw-web-container || true
+          docker run -d -p 8888:80 --name daw-web-container calonsocaminafpfomento/daw-web:latest
