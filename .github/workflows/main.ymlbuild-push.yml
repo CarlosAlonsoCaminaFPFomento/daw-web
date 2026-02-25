@@ -15,17 +15,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login en Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: calonsocaminafpfomento
-          password: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u calonsocaminafpfomento --password-stdin
 
-      - name: Build y Push de la imagen
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: calonsocaminafpfomento/daw-web:latest
+      - name: Construir imagen
+        run: docker build -t calonsocaminafpfomento/daw-web:latest .
+
+      - name: Subir imagen a Docker Hub
+        run: docker push calonsocaminafpfomento/daw-web:latest
 
       - name: Ejecutar contenedor en puerto 8888
         run: |
